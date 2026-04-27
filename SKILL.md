@@ -1,13 +1,13 @@
 ---
 name: whitebox-testing
 description: |
-  White-box testing expert for code structure analysis, test case design, path coverage, and cyclomatic complexity calculation.
+  White-box testing expert for code structure analysis, path coverage, and cyclomatic complexity calculation.
   
-  TRIGGER for: 白盒测试, white-box testing, whitebox testing, code coverage, test coverage, path coverage, statement coverage, branch coverage, decision coverage, cyclomatic complexity, McCabe complexity, control flow graph, flowchart, code path analysis, independent paths, test case design, boundary testing, edge case testing.
+  TRIGGER for: 白盒测试, white-box testing, whitebox testing, code coverage, test coverage, path coverage, statement coverage, branch coverage, decision coverage, cyclomatic complexity, McCabe complexity, control flow graph, flowchart, code path analysis, independent paths.
   
   TRIGGER when user: analyzes code paths, designs comprehensive tests, calculates complexity, improves coverage, systematically tests functions with many if-else branches, asks "how many test cases needed", wants to cover "all paths" or "all branches", mentions pytest/Jest/JUnit coverage.
   
-  DO NOT trigger for: simple unit test requests without coverage/complexity mention, debugging, refactoring, API questions, algorithm implementation.
+  DO NOT trigger for: simple unit test requests without coverage/complexity mention, test case design, boundary testing, edge case testing, debugging, refactoring, API questions, algorithm implementation.
 ---
 
 # whitebox-testing
