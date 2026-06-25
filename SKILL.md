@@ -1,12 +1,25 @@
 ---
 name: whitebox-testing
-description: "Use when the task involves white-box testing, code-structure analysis, path coverage, cyclomatic complexity, or graph-driven dataflow path coverage.
+description: >-
+  Use when the task involves white-box testing, code-structure analysis,
+  path coverage, cyclomatic complexity, or graph-driven dataflow path coverage.
 
-TRIGGER for: 白盒测试, white-box testing, whitebox testing, 覆盖率, 代码覆盖率, 路径覆盖, 路径分析, 语句覆盖, 分支覆盖, 判定覆盖, 判定路径覆盖, 数据流路径覆盖, def-use coverage, 定义使用覆盖, 变量依赖图, 变量依赖覆盖, 圈复杂度, McCabe complexity, McCabe复杂度, 控制流图, 控制流分析, 代码路径分析.
 
-TRIGGER when user: analyzes code paths, designs comprehensive tests, calculates complexity, improves coverage, asks how many test cases are needed, wants all paths or branches, requests def-use paths, variable dependency graphs, test-to-path mapping, or mentions pytest/Jest/JUnit coverage.
+  TRIGGER for: 白盒测试, white-box testing, whitebox testing, 覆盖率, 代码覆盖率,
+  路径覆盖, 路径分析, 语句覆盖, 分支覆盖, 判定覆盖, 判定路径覆盖, 数据流路径覆盖,
+  def-use coverage, 定义使用覆盖, 变量依赖图, 变量依赖覆盖, 圈复杂度, McCabe complexity,
+  McCabe复杂度, 控制流图, 控制流分析, 代码路径分析.
 
-DO NOT trigger for: simple unit-test requests without coverage goals, boundary-only testing, debugging, refactoring, API questions, or algorithm implementation."
+
+  TRIGGER when user: analyzes code paths, designs comprehensive tests,
+  calculates complexity, improves coverage, asks how many test cases are needed,
+  wants all paths or branches, requests def-use paths, variable dependency graphs,
+  test-to-path mapping, or mentions pytest/Jest/JUnit coverage.
+
+
+  DO NOT trigger for: simple unit-test requests without coverage goals,
+  boundary-only testing, debugging, refactoring, API questions,
+  or algorithm implementation.
 ---
 
 # whitebox-testing
