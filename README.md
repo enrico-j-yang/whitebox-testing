@@ -1,8 +1,51 @@
 # whitebox-testing
 
+[![npx skills add](https://img.shields.io/badge/npx%20skills%20add-enrico--j--yang%2Fwhitebox--testing-blue?logo=npm)](https://skills.sh/b/enrico-j-yang/whitebox-testing)
+[![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-orange?logo=anthropic)](https://github.com/enrico-j-yang/whitebox-testing)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 `whitebox-testing` 是一个面向白盒测试分析的 AI skill，用来帮助代理在阅读源代码后，围绕控制流、数据流和覆盖标准系统化地设计测试。
 
 `whitebox-testing` is an AI skill for white-box testing analysis. It helps an agent read source code and design tests systematically around control flow, data flow, and coverage criteria.
+
+## 安装 / Installation
+
+选择任一方式安装（推荐第一种，跨 agent 通用）：
+
+Pick any of the methods below (the first is recommended — works across agents):
+
+### 1. 通过 `npx skills add` 安装 / Install via `npx skills add`
+
+```bash
+npx skills add enrico-j-yang/whitebox-testing
+```
+
+支持 Claude Code、Cursor、Cline、Codex、Continue、Gemini CLI 等 70+ agent —— CLI 会自动检测当前环境并装到正确路径。
+
+Supports Claude Code, Cursor, Cline, Codex, Continue, Gemini CLI, and 70+ other agents — the CLI auto-detects your environment and installs to the right location.
+
+### 2. 通过 Claude Code 插件市场安装 / Install via Claude Code plugin marketplace
+
+```text
+/plugin marketplace add enrico-j-yang/whitebox-testing
+/plugin install whitebox-testing@enrico-skills
+```
+
+### 3. 直接 git clone / Plain git clone
+
+```bash
+# Linux / macOS
+git clone https://github.com/enrico-j-yang/whitebox-testing \
+  ~/.claude/skills/whitebox-testing
+
+# Windows PowerShell
+git clone https://github.com/enrico-j-yang/whitebox-testing `
+  "$HOME\.claude\skills\whitebox-testing"
+```
+
+安装完成后，在 Claude Code 中执行 `/reload-skills` 即可激活。
+
+After installation, run `/reload-skills` in Claude Code to activate.
 
 它的核心目标不是“多写几个测试”，而是把下面这些工作串成一套明确流程：
 
