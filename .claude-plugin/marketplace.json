@@ -1,0 +1,35 @@
+{
+  "name": "enrico-skills",
+  "owner": {
+    "name": "Enrico Yang",
+    "url": "https://github.com/enrico-j-yang"
+  },
+  "metadata": {
+    "description": "Enrico's Claude Code skills marketplace",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "whitebox-testing",
+      "source": ".",
+      "description": "White-box testing skill: path coverage, cyclomatic complexity, decision-path analysis, dataflow path coverage, and language-specific test generation for Python/JS/Java/C.",
+      "version": "1.0.0",
+      "category": "testing",
+      "tags": [
+        "whitebox-testing",
+        "coverage",
+        "path-analysis",
+        "cyclomatic-complexity",
+        "dataflow",
+        "pytest",
+        "jest",
+        "junit"
+      ],
+      "author": {
+        "name": "Enrico Yang"
+      },
+      "homepage": "https://github.com/enrico-j-yang/whitebox-testing",
+      "license": "MIT"
+    }
+  ]
+}

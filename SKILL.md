@@ -276,17 +276,13 @@ app/module.py             100     10    90%   25-30, 45
 | Mock 限制 / Mock limits | 外部依赖被绕过 / External dependencies were bypassed | 集成测试覆盖 / Cover with integration tests |
 | 异常场景 / Exceptional scenarios | 极端错误处理 / Extreme error-handling paths | 评估必要性 / Evaluate necessity |
 
-### 步骤 12：迭代优化 / Step 12: Iterate and Improve
+### 步骤 12：确认目标并迭代优化 / Step 12: Confirm Target and Iterate
 
-如果覆盖率未达 100%：
+**先给出目标覆盖率建议 / First present the suggested target coverage:**
 
-If coverage is still below the goal:
+根据被测代码的类型，先向用户展示以下建议表：
 
-1. 分析 `Missing` 行号对应的代码 / Analyze the code behind the `Missing` lines.
-2. 设计新测试用例覆盖缺失路径 / Design new tests for the uncovered paths.
-3. 返回步骤 7 / Return to Step 7.
-
-**目标覆盖率建议 / Suggested target coverage:**
+Based on the type of the code under test, first show the user the following recommendation table:
 
 | 项目类型 / Project type | 语句覆盖 / Statement | 分支覆盖 / Branch |
 |-------------------------|----------------------|-------------------|
@@ -294,6 +290,27 @@ If coverage is still below the goal:
 | 一般功能 / General features | 90%+ | 80%+ |
 | 工具函数 / Utility functions | 100% | 100% |
 | UI 组件 / UI components | 80%+ | 70%+ |
+
+**然后追问用户需要达到的覆盖率 / Then ask the user what coverage they want to reach:**
+
+使用 AskUserQuestion 或等效提问方式询问用户的目标覆盖率（语句覆盖率、分支覆盖率，以及如适用的数据流路径覆盖率），并记录用户的确认值作为本次测试目标。
+
+Use AskUserQuestion or an equivalent prompt to ask the user for the target coverage values (statement, branch, and dataflow-path coverage if applicable). Record the confirmed values as the goal for this round.
+
+**迭代直至达到目标 / Iterate until the target is reached:**
+
+如果当前覆盖率未达到用户确认的目标：
+
+If the current coverage is below the user-confirmed target:
+
+1. 分析 `Missing` 行号对应的代码 / Analyze the code behind the `Missing` lines.
+2. 设计新测试用例覆盖缺失路径 / Design new tests for the uncovered paths.
+3. **重复执行步骤 7 到步骤 11 / Repeat Steps 7 through 11**（重新设计用例 → 生成测试代码 → 运行测试 → 收集覆盖率 → 分析未覆盖代码）。
+4. 持续迭代，直到覆盖率达到用户设定的目标为止 / Continue iterating until the coverage meets the user-defined target.
+
+每一轮迭代完成后向用户汇报当前覆盖率与目标的差距，并说明本轮新增的测试用例与覆盖到的路径。
+
+After each iteration, report the gap between current coverage and the target, and describe the new test cases added and the paths they cover.
 
 ---
 

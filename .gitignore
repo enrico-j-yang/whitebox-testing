@@ -1,0 +1,11 @@
+# Local-only directories — never commit
+.claude/
+whitebox-testing-workspace/
+.playwright-mcp/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
