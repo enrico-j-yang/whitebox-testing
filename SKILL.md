@@ -2,19 +2,18 @@
 name: whitebox-testing
 description: >-
   Use when the task involves white-box testing, code-structure analysis,
-  path coverage, cyclomatic complexity, or graph-driven dataflow path coverage.
+  path coverage, or cyclomatic complexity.
 
 
   TRIGGER for: 白盒测试, white-box testing, whitebox testing, 覆盖率, 代码覆盖率,
-  路径覆盖, 路径分析, 语句覆盖, 分支覆盖, 判定覆盖, 判定路径覆盖, 数据流路径覆盖,
-  def-use coverage, 定义使用覆盖, 变量依赖图, 变量依赖覆盖, 圈复杂度, McCabe complexity,
+  路径覆盖, 路径分析, 语句覆盖, 分支覆盖, 判定覆盖, 判定路径覆盖,
+  圈复杂度, McCabe complexity,
   McCabe复杂度, 控制流图, 控制流分析, 代码路径分析.
 
 
   TRIGGER when user: analyzes code paths, designs comprehensive tests,
   calculates complexity, improves coverage, asks how many test cases are needed,
-  wants all paths or branches, requests def-use paths, variable dependency graphs,
-  test-to-path mapping, or mentions pytest/Jest/JUnit coverage.
+  wants all paths or branches, or mentions pytest/Jest/JUnit coverage.
 
 
   DO NOT trigger for: simple unit-test requests without coverage goals,
@@ -43,7 +42,6 @@ Using this skill helps you produce:
 3. **清晰的流程图 / Clear flow diagrams**：ASCII 格式控制流程图，直观展示代码结构
 4. **专业测试用例 / Professional test cases**：符合 pytest/Jest/JUnit 规范的测试代码
 5. **覆盖率优化建议 / Coverage-improvement guidance**：具体命令和迭代策略
-6. **Dataflow path coverage**：use def-use paths, variable-dependency graphs, and DOT/SVG/HTML artifacts as explicit coverage targets
 
 ## 触发条件 / When to Trigger
 
@@ -71,7 +69,7 @@ Use AskUserQuestion or an equivalent user prompt to confirm:
 
 1. **编程语言 / Language**：Python / Java / JavaScript/TypeScript / C/C++ / Go / 其他
 2. **被测代码文件 / Target source files**：读取源文件，按文件大小列出各个模块
-3. **覆盖标准 / Coverage criterion**：语句覆盖 / 判定路径覆盖 / dataflow path coverage
+3. **覆盖标准 / Coverage criterion**：语句覆盖 / 判定路径覆盖
 
 ### 步骤 2：加载语言指南 / Step 2: Load the Language Guide
 
@@ -84,8 +82,6 @@ Choose the matching reference file by language:
 - Java -> `references/java.md`
 - C/C++ -> `references/clang.md`
 - 其他 / Other -> 使用通用原则 / use the general principles in this skill
-
-When the user asks for dataflow-path coverage, def-use paths, variable-dependency graphs, or DOT/SVG/HTML reports, also read `references/dataflow-path-coverage.md` and use the bundled analyzer documented there. Do not look for `rust-dataflow-analyzer.exe` in the current workspace.
 
 ### 步骤 3：判定节点分析 / Step 3: Analyze Decision Points
 
@@ -270,13 +266,6 @@ app/module.py             100     10    90%   25-30, 45
 - **Cover / Coverage**：覆盖率百分比
 - **Missing / Missing lines**：未覆盖的行号
 
-**Dataflow-path coverage standard / 数据流路径覆盖标准：**
-
-1. Set `$analyzer = "$HOME\.agents\skills\whitebox-testing\scripts\rust-dataflow-analyzer.exe"` and run `& $analyzer analyze --lang python --input <src_dir> --out <report_dir>`.
-2. Treat def-use paths and variable-dependency paths as coverage targets.
-3. Build `test -> paths` and `path -> tests` mappings, and prioritize uncovered plus split paths.
-4. Document dynamic behavior, external dependencies, unreachable code, and conservative-analysis false positives.
-
 ### 步骤 11：分析未覆盖代码 / Step 11: Analyze Uncovered Code
 
 **未覆盖原因分类 / Categories of uncovered-code causes:**
@@ -306,9 +295,9 @@ Based on the type of the code under test, first show the user the following reco
 
 **然后追问用户需要达到的覆盖率 / Then ask the user what coverage they want to reach:**
 
-使用 AskUserQuestion 或等效提问方式询问用户的目标覆盖率（语句覆盖率、分支覆盖率，以及如适用的数据流路径覆盖率），并记录用户的确认值作为本次测试目标。
+使用 AskUserQuestion 或等效提问方式询问用户的目标覆盖率（语句覆盖率、分支覆盖率），并记录用户的确认值作为本次测试目标。
 
-Use AskUserQuestion or an equivalent prompt to ask the user for the target coverage values (statement, branch, and dataflow-path coverage if applicable). Record the confirmed values as the goal for this round.
+Use AskUserQuestion or an equivalent prompt to ask the user for the target coverage values (statement and branch coverage). Record the confirmed values as the goal for this round.
 
 **迭代直至达到目标 / Iterate until the target is reached:**
 
@@ -345,12 +334,6 @@ After the analysis, produce the following files:
    - 参数化边界测试 / Parameterized boundary tests
    - 清晰的中文注释，必要时可补英文说明 / Clear Chinese comments, with English notes when useful
 
-3. **`dataflow_path_coverage.md`** and **`path_mapping.csv`/`path_mapping.json`** - required when using dataflow-path coverage
-   - analyzer command, source directory, and output directory
-   - DOT/SVG/HTML report locations
-   - total path counts and covered/uncovered/split statistics
-   - per-path `path_id`, root function, gap reason, and linked tests
-
 ---
 
 ## 注意事项 / Notes
@@ -361,8 +344,6 @@ After the analysis, produce the following files:
 4. **异常处理路径必须覆盖 / Exception-handling paths must be covered**
 5. **不可达代码需要记录并报告 / Unreachable code must be documented and reported**
 6. **测试数据必须与函数逻辑一致 / Test data must match the real function logic**，预期值要准确计算
-7. **Dataflow path coverage does not replace statement/branch coverage**; use it to verify def-use and dependency propagation.
-8. **Prefer the bundled analyzer documented in `references/dataflow-path-coverage.md` for Python dataflow work** instead of rebuilding ad-hoc def-use extractors.
 
 ---
 
@@ -375,15 +356,9 @@ Available language guides:
 - `references/python.md` - pytest + pytest-cov + Mock
 - `references/javascript.md` - Jest + 覆盖率 / coverage + Mock 策略 / mock strategy
 - `references/java.md` - JUnit + Mockito + JaCoCo
-- `references/dataflow-path-coverage.md` - dataflow-path coverage workflow with the bundled Rust analyzer
 - `references/clang.md` - Unity + FFF Mock + lcov
 
 ---
-
-## 附加资源 / Additional Resources
-
-- `references/dataflow-path-coverage.md` - workflow for dataflow path coverage, including the bundled analyzer location and invocation pattern
-- `scripts/rust-dataflow-analyzer.exe` - bundled Windows static-analysis binary under `$HOME\.agents\skills\whitebox-testing\scripts\`
 
 ## 快速模式 / Fast Mode
 

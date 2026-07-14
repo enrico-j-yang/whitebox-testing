@@ -12,7 +12,7 @@
     {
       "name": "whitebox-testing",
       "source": ".",
-      "description": "White-box testing skill: path coverage, cyclomatic complexity, decision-path analysis, dataflow path coverage, and language-specific test generation for Python/JS/Java/C.",
+      "description": "White-box testing skill: path coverage, cyclomatic complexity, decision-path analysis, and language-specific test generation for Python/JS/Java/C.",
       "version": "1.0.0",
       "category": "testing",
       "tags": [
@@ -20,7 +20,6 @@
         "coverage",
         "path-analysis",
         "cyclomatic-complexity",
-        "dataflow",
         "pytest",
         "jest",
         "junit"

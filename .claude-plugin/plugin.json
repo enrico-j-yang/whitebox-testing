@@ -1,7 +1,7 @@
 {
   "name": "whitebox-testing",
   "version": "1.0.0",
-  "description": "White-box testing skill with path coverage, cyclomatic complexity, decision-path analysis, dataflow path coverage, and test generation for Python/JS/Java/C.",
+  "description": "White-box testing skill with path coverage, cyclomatic complexity, decision-path analysis, and test generation for Python/JS/Java/C.",
   "author": {
     "name": "Enrico Yang"
   },
@@ -12,7 +12,6 @@
     "coverage",
     "path-coverage",
     "cyclomatic-complexity",
-    "dataflow",
     "pytest",
     "jest",
     "junit"
