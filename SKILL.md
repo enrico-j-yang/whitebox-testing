@@ -39,7 +39,7 @@ Using this skill helps you produce:
 
 1. **完整的路径分析 / Complete path analysis**：识别判定节点、列举独立路径、计算覆盖率需求
 2. **圈复杂度评估 / Cyclomatic-complexity assessment**：McCabe 复杂度计算 + 风险评级 + 重构建议
-3. **清晰的流程图 / Clear flow diagrams**：ASCII 格式控制流程图，直观展示代码结构
+3. **清晰的流程图 / Clear flow diagrams**：SVG 控制流程图，直观展示代码结构并支持缩放
 4. **专业测试用例 / Professional test cases**：符合 pytest/Jest/JUnit 规范的测试代码
 5. **覆盖率优化建议 / Coverage-improvement guidance**：具体命令和迭代策略
 
@@ -126,39 +126,148 @@ List candidate helper functions or sub-functions that can reduce complexity.
 
 ### 步骤 5：绘制控制流程图 / Step 5: Draw the Control-Flow Diagram
 
-**使用简化 ASCII 格式 / Use a simplified ASCII layout:**
+**5.1 推荐使用 Graphviz / Recommend Graphviz for auto-layout:**
 
+对于判定节点较多（V(G) ≥ 5）的函数，手动拼接 SVG 坐标容易导致节点重叠、连线交叉。**推荐使用 Graphviz** 自动计算布局，生成清晰美观的控制流图。
+
+For functions with many decision nodes (V(G) ≥ 5), manually piecing together SVG coordinates often causes node overlaps and edge crossings. **Graphviz is recommended** for automatic layout.
+
+**5.2 确认是否安装 Graphviz / Confirm Graphviz installation:**
+
+使用 AskUserQuestion 或等效提问方式询问用户：
+
+Use AskUserQuestion or an equivalent prompt:
+
+> "判定节点较多（V(G) = N），推荐使用 Graphviz 自动布局生成控制流图。是否允许安装 graphviz？"
+>
+> 选项：
+> - "安装 Graphviz（推荐）" - 自动安装 Python `graphviz` 包并生成 SVG
+> - "跳过，生成手写 SVG" - 使用手动坐标生成简化版 SVG（布局可能不够理想）
+
+如果用户选择安装，执行以下操作：
+
+If the user confirms installation:
+
+```bash
+pip install graphviz
 ```
-        ┌───────────┐
-        │   开始    │
-        └─────┬─────┘
-              │
-        ┌─────▼─────┐
-        │  条件D1?  │
-        └─────┬─────┘
-              │
-    ┌─────────┴─────────┐
-    │True               │False
-    │                   │
-┌───▼───┐         ┌─────▼─────┐
-│处理A  │         │  处理B    │
-└───┬───┘         └─────┬─────┘
-    │                   │
-    └─────────┬─────────┘
-              │
-        ┌─────▼─────┐
-        │   结束    │
-        └───────────┘
+
+然后创建临时 Python 脚本，使用 graphviz 定义节点和边，渲染为 `control_flow.svg`。脚本完成后删除。
+
+Then create a temporary Python script that defines nodes and edges using graphviz, renders to `control_flow.svg`, and delete the script afterwards.
+
+**5.3 Graphviz 脚本模板 / Graphviz script template:**
+
+```python
+# -*- coding: utf-8 -*-
+"""生成控制流图，运行后自动删除。"""
+import graphviz
+
+def build_graph() -> graphviz.Digraph:
+    g = graphviz.Digraph(
+        name="CFG",
+        node_attr={"fontname": "Arial", "fontsize": "11"},
+        edge_attr={"fontname": "Arial", "fontsize": "10"},
+    )
+    g.attr(rankdir="TB", label="{function_name}  V(G)={complexity}", fontsize="14")
+
+    # ─── 节点定义 / Node definitions ───
+    g.node("start", "开始", shape="box", style="rounded")
+    g.node("D1", "D1\n条件描述?", shape="diamond")
+    g.node("PA", "处理 A", shape="box")
+    g.node("PB", "处理 B", shape="box")
+    g.node("end", "结束", shape="box", style="rounded")
+
+    # 异常路径节点（用红色区分）
+    g.node("D_EX", "Exception?\n(catch)", shape="diamond",
+           style="filled", fillcolor="#fef2f2")
+    g.node("ret_fail", "返回 failure", shape="box",
+           style="filled", fillcolor="#fef2f2")
+
+    # ─── 连线定义 / Edge definitions ───
+    g.edge("start", "D1")
+    g.edge("D1", "PA", label="True")
+    g.edge("D1", "PB", label="False")
+    g.edge("PA", "end")
+    g.edge("PB", "end")
+
+    # 异常路径用红色虚线
+    g.edge("PA", "D_EX", style="dashed", color="#b91c1c")
+    g.edge("D_EX", "ret_fail", color="#b91c1c")
+    g.edge("ret_fail", "end", style="dashed", color="#b91c1c")
+
+    return g
+
+g = build_graph()
+g.render("control_flow", cleanup=True, format="svg")
+print("control_flow.svg 已生成")
 ```
 
-**流程图绘制规则 / Diagram rules:**
+**5.4 节点和边的命名规范 / Node & edge naming conventions:**
 
-1. 开始/结束节点用方框 / Use boxes for start and end nodes.
-2. 判定节点用菱形（或注明 `条件?`） / Use diamonds for decisions, or clearly mark them as conditions.
-3. 处理节点用方框 / Use boxes for processing nodes.
-4. 真分支在左/上，假分支在右/下 / Place the true branch on the left or top, false on the right or bottom.
-5. 循环用回箭头表示 / Show loops with return arrows.
-6. 每个判定标注编号（D1, D2...） / Label each decision point (D1, D2, ...).
+| 元素 / Element | 形状 / Shape | 示例 / Example |
+|----------------|--------------|----------------|
+| 开始/结束 | `box`, `style="rounded"` | `g.node("start", "开始", shape="box", style="rounded")` |
+| 判定节点 | `diamond` | `g.node("D1", "D1\n条件?", shape="diamond")` |
+| 处理节点 | `box` | `g.node("P1", "处理 A", shape="box")` |
+| 成功赋值 | `box`, `style="filled"`, `fillcolor="#dcfce7"` | `g.node("P5", "success=True", shape="box", style="filled", fillcolor="#dcfce7")` |
+| 异常节点 | `diamond`/`box`, `fillcolor="#fef2f2"` | 红色背景区分 |
+| True 分支 | `label="True"` | 正常线（深色实线） |
+| False 分支 | `label="False"` | 正常线（深色实线） |
+| 异常路径 | `style="dashed"`, `color="#b91c1c"` | 红色虚线 |
+
+**5.5 对于简单函数（V(G) ≤ 4）/ For simple functions (V(G) ≤ 4):**
+
+可直接生成手写 SVG（参考下方最小示例），无需 Graphviz。
+
+Can generate a hand-written SVG (reference the minimal example below) without Graphviz.
+
+<details>
+<summary>手写 SVG 最小示例 / Minimal hand-written SVG example</summary>
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
+  <title id="title">控制流程图</title>
+  <desc id="desc">展示开始、判定 D1、两个分支和结束节点</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#334155" />
+    </marker>
+  </defs>
+  <g fill="white" stroke="#334155" stroke-width="2" font-family="Arial, 'Microsoft YaHei', sans-serif">
+    <rect x="285" y="24" width="150" height="54" rx="8" />
+    <text x="360" y="57" text-anchor="middle" fill="#0f172a" stroke="none">开始</text>
+    <polygon points="360,118 440,168 360,218 280,168" />
+    <text x="360" y="173" text-anchor="middle" fill="#0f172a" stroke="none">D1 条件?</text>
+    <rect x="90" y="270" width="180" height="54" rx="8" />
+    <text x="180" y="303" text-anchor="middle" fill="#0f172a" stroke="none">处理 A</text>
+    <rect x="450" y="270" width="180" height="54" rx="8" />
+    <text x="540" y="303" text-anchor="middle" fill="#0f172a" stroke="none">处理 B</text>
+    <rect x="285" y="390" width="150" height="54" rx="8" />
+    <text x="360" y="423" text-anchor="middle" fill="#0f172a" stroke="none">结束</text>
+  </g>
+  <g fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arrow)">
+    <path d="M360 78 V118" />
+    <path d="M280 168 H180 V270" />
+    <path d="M440 168 H540 V270" />
+    <path d="M180 324 V360 H360 V390" />
+    <path d="M540 324 V360 H360 V390" />
+  </g>
+  <g fill="#475569" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="14">
+    <text x="205" y="160">真</text>
+    <text x="465" y="160">假</text>
+  </g>
+</svg>
+```
+
+</details>
+
+**5.6 通用规则 / General rules:**
+
+1. 将 SVG 保存为 `control_flow.svg`，在 `path_analysis.md` 中引用：`![控制流程图](control_flow.svg)`。
+2. 为 SVG 提供 `<title>` 和 `<desc>`（Graphviz 自动生成）。
+3. 在报告中同时保留节点/边的文字列表，作为不支持 SVG 的阅读器的后备说明。
+4. 真分支标 True，假分支标 False；判定节点编号 D1, D2...；路径编号 P1, P2...。
 
 ### 步骤 6：列举独立路径 / Step 6: Enumerate Independent Paths
 
@@ -325,11 +434,15 @@ After the analysis, produce the following files:
 1. **`path_analysis.md`** - 路径分析报告 / Path-analysis report
    - 判定节点表 / Decision-point table
    - 圈复杂度计算 / Cyclomatic-complexity calculation
-   - 流程图 / Flow diagram
+   - SVG 流程图引用 / SVG flow-diagram reference
+   - 节点和边的文字后备说明 / Textual node-and-edge fallback
    - 独立路径列表 / Independent-path list
    - 未覆盖代码分析 / Uncovered-code analysis
 
-2. **`test_{module}.py`** 或 **`{module}.test.js`** - 测试代码文件 / Test-code file
+2. **`control_flow.svg`** - 自包含控制流程图 / Self-contained control-flow diagram
+   - 不依赖外部渲染器、脚本或样式表 / No external renderer, script, or stylesheet dependency
+
+3. **`test_{module}.py`** 或 **`{module}.test.js`** - 测试代码文件 / Test-code file
    - 完整的可执行测试用例 / Complete executable test cases
    - 参数化边界测试 / Parameterized boundary tests
    - 清晰的中文注释，必要时可补英文说明 / Clear Chinese comments, with English notes when useful
