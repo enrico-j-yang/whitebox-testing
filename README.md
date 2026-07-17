@@ -145,12 +145,12 @@ For decision-path coverage, this skill helps with the following activities:
 
 - 识别所有判定节点；
 - 计算圈复杂度；
-- 用 SVG 流程图表达控制流，并保留节点/边文字说明作为后备；
+- 用 Mermaid 流程图表达控制流，并保留节点/边文字说明作为后备；
 - 列举独立路径并为每条路径设计测试用例。
 
 - Identify all decision points.
 - Calculate cyclomatic complexity.
-- Express control flow with SVG diagrams, with a textual node/edge fallback.
+- Express control flow with Mermaid diagrams, with a textual node/edge fallback.
 - Enumerate independent paths and design a test case for each path.
 
 ## 两种覆盖标准的关系 / How the Two Coverage Criteria Relate
@@ -180,11 +180,9 @@ A common mistake is to look only at the statement-coverage number. High statemen
 Depending on the task, this skill typically generates or recommends the following outputs:
 
 - `path_analysis.md`：路径分析报告，包含判定节点、圈复杂度、流程图、独立路径和遗漏路径分析；
-- `control_flow.svg`：自包含、可缩放的控制流程图；
 - `test_{module}.py` 或 `{module}.test.js`：按路径设计的测试代码。
 
 - `path_analysis.md`: a path-analysis report containing decision points, cyclomatic complexity, flow diagrams, independent paths, and uncovered-path analysis.
-- `control_flow.svg`: a self-contained, scalable control-flow diagram.
 - `test_{module}.py` or `{module}.test.js`: test code designed against explicit paths.
 
 ## 这个 skill 的目录结构 / Directory Structure of This Skill

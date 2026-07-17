@@ -431,9 +431,9 @@ static int conn_connect(char *token) {
 }
 ```
 
-### 流程图绘制（SVG）
+### 流程图绘制（Mermaid）
 
-步骤5默认使用自包含 SVG 保存为 `control_flow.svg`，并在 `path_analysis.md` 中使用 `![控制流程图](control_flow.svg)` 引用。使用圆角矩形表示开始/结束、菱形表示判定、矩形表示处理步骤；用带箭头的 `<path>` 表示控制流，用回箭头表示循环。SVG 必须包含 `viewBox`、`<title>` 和 `<desc>`，不依赖外部渲染器、脚本或样式表，并在报告中附带节点/边的文字说明。
+步骤5默认在 `path_analysis.md` 中直接输出 Mermaid `flowchart TD` 代码块，不需要安装 Graphviz、Python 包或生成独立图片文件。使用 `([开始])`/`([结束])` 表示开始与结束，`{"D1: 条件?"}` 表示判定，`[处理]` 表示处理步骤；所有判定分支必须标注真/假，循环必须使用回边表示。图后附节点/边的文字说明，供不支持 Mermaid 的阅读器使用。
 
 ---
 
