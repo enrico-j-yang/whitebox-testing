@@ -63,13 +63,69 @@ Using this skill helps you produce:
 
 ### 步骤 1：确认测试目标 / Step 1: Confirm the Testing Target
 
-使用 AskUserQuestion 或等效提问方式确认：
+先确认编程语言和覆盖标准，再按下述规则自动发现或询问被测代码文件：
 
-Use AskUserQuestion or an equivalent user prompt to confirm:
+First confirm the language and coverage criterion, then discover or ask for the target source file according to the rules below:
 
 1. **编程语言 / Language**：Python / Java / JavaScript/TypeScript / C/C++ / Go / 其他
-2. **被测代码文件 / Target source files**：读取源文件，按文件大小列出各个模块
-3. **覆盖标准 / Coverage criterion**：语句覆盖 / 判定路径覆盖
+2. **覆盖标准 / Coverage criterion**：语句覆盖 / 判定路径覆盖
+3. **被测代码文件 / Target source file**：不要仅按文件大小或最近提交直接猜测，必须执行下面的目标选择流程
+
+Do not choose the target merely by file size or the latest commit. The target-selection workflow below is mandatory.
+
+#### 被测文件自动选择 / Automatic Target Selection
+
+1. **发现源码 / Discover source files**
+   - 枚举项目中的源码文件，排除测试目录、测试文件、生成代码、依赖目录、构建产物、迁移快照和 vendor 代码。
+   - 按语言和仓库现有命名习惯识别源码，例如 Python 的 `*.py`、JavaScript/TypeScript 的 `*.js`/`*.ts`/`*.jsx`/`*.tsx`、Java 的 `*.java`、C/C++ 的 `*.c`/`*.cc`/`*.cpp`/`*.h`/`*.hpp`。
+   - 对源码按**有效代码行数**计数并降序排列。有效代码行默认排除空行；若可靠识别注释不会增加实现成本，也排除纯注释行。不要使用文件字节大小代替代码行数。
+
+   Discover project source files while excluding test files/directories, generated code, dependencies, build outputs, migration snapshots, and vendored code. Rank sources by effective lines of code, not byte size.
+
+2. **建立源码到测试的映射 / Map sources to tests**
+   - 先读取仓库测试配置和现有目录结构，再使用语言惯例匹配测试文件。
+   - Python 示例：`app/foo.py` 对应 `tests/test_foo.py`、同路径下的 `test_foo.py`，以及名称明确包含 `foo` 的白盒/单元测试文件。
+   - JavaScript/TypeScript 示例：`src/foo.ts` 对应 `foo.test.ts`、`foo.spec.ts` 或 `__tests__/foo.*`。
+   - Java 示例：`Foo.java` 对应 `FooTest.java`、`FooTests.java`。
+   - C/C++ 示例：`foo.c`/`foo.cpp` 对应 `test_foo.*`、`foo_test.*`。
+   - 仅凭测试文件中导入或调用了源码，不足以认定为“对应测试”；测试名称、路径或测试配置还必须表明它以该源码模块为主要目标。一个源码可对应多个测试文件。
+
+   Inspect repository test configuration and naming conventions before mapping. A source may map to multiple tests. Incidental imports alone do not make a test a corresponding test file.
+
+3. **优先选择无测试源码 / Prefer an untested source**
+   - 如果存在一个或多个没有对应测试文件的源码，列出这些源码及有效代码行数。
+   - 自动选择其中有效代码行数最多的一个作为被测代码文件，不再要求用户从已有测试的源码中选择。
+   - 若最高行数并列，优先选择业务源码而非入口、配置或数据模型；仍并列时按路径字典序选择，确保结果可重复。
+
+   If any source has no corresponding test file, list the untested sources and select the one with the most effective lines of code. Break ties by preferring business logic, then lexicographically by path.
+
+4. **所有源码都有测试时检查 Git / Check Git when every source has tests**
+   - 只有在候选源码全部存在对应测试文件时，才检查当前目录是否由 Git 管理，例如执行 `git rev-parse --is-inside-work-tree`。
+   - 不要因为工作区存在未提交修改而停止，也不要修改或还原无关文件。
+
+   Check whether the repository is managed by Git only after every candidate source has a corresponding test. A dirty worktree does not block this analysis.
+
+5. **Git 仓库中的测试时序分析 / Test recency analysis in a Git repository**
+   - 对每个源码及其对应测试文件，读取测试文件的**文件系统最后修改时间**作为测试基准时间；一个源码对应多个测试文件时，取其中最新的修改时间，并记录产生该时间的测试文件。不要用测试文件的 Git 提交时间替代文件系统修改时间。
+   - 从该基准时间之后的 Git 提交中，找出有修改记录的对应源码文件。使用 `git log --since=<time> --numstat -- <source>` 或等价的非交互命令统计该源码在此期间的累计修改行数：`新增行数 + 删除行数`。
+   - 列出所有“测试最后修改之后源码仍有 Git 修改”的源码，包括：源码路径、对应测试、测试基准时间、后续提交数、累计新增、累计删除和累计修改行数。
+   - 自动选择累计修改行数最多的源码作为被测代码文件。并列时依次按后续提交数、有效代码行数和路径字典序选择。
+   - Git rename 必须尽量使用 `--follow` 或等价方式追踪；二进制文件和无法统计 `numstat` 的变更不纳入修改行数。
+   - 如果没有任何源码在测试基准时间之后发生 Git 修改，明确说明测试相对源码是最新的，然后按有效代码行数从多到少列出源码，使用 AskUserQuestion 或等效方式让用户选择，不要擅自指定。
+
+   For each source/test mapping, use the latest filesystem modification time across its corresponding tests as the test baseline. Do not replace it with the tests' Git commit time. After that baseline, sum source additions and deletions from Git history. List stale source/test mappings and automatically select the source with the largest total churn. If no source changed after its tests, present sources ordered by effective LOC and ask the user to choose.
+
+6. **非 Git 仓库由用户选择 / Ask the user in a non-Git repository**
+   - 当候选源码全部有对应测试、但当前仓库未使用 Git 管理时，按有效代码行数从多到少列出源码文件。
+   - 使用 AskUserQuestion 或等效方式询问用户选择哪个源码作为被测代码文件，不要自动选择。
+
+   If every source has tests but the repository is not managed by Git, list sources from most to fewest effective lines of code and ask the user which source to test.
+
+7. **记录选择依据 / Record the rationale**
+   - 在 `path_analysis.md` 的 Scope 中记录：源码发现范围、源码与测试映射、是否为 Git 仓库、采用的选择分支、排序指标和最终目标。
+   - 开始路径分析前向用户简要说明选择结果。只有流程要求用户选择时才提问；其余分支直接按规则继续。
+
+   Record the discovery scope, source/test mapping, Git status, selection branch, ranking metric, and final target in the report. Ask only when the rules explicitly require user selection.
 
 ### 步骤 2：加载语言指南 / Step 2: Load the Language Guide
 
